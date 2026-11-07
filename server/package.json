@@ -5,6 +5,7 @@
   "description": "Campus Event Hub - Express/TypeScript Backend",
   "main": "dist/index.js",
   "scripts": {
+    "build": "npx prisma generate && tsc"
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc && npx prisma generate",
     "start": "node dist/index.js",
@@ -41,7 +42,6 @@
     "@types/pdfkit": "^0.17.7",
     "@types/supertest": "^6.0.2",
     "jest": "^29.7.0",
-    "prisma": "^5.22.0",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
