@@ -5,7 +5,7 @@
   "description": "Campus Event Hub - Express/TypeScript Backend",
   "main": "dist/index.js",
   "scripts": {
-    "build": "npx prisma generate && tsc"
+    "build": "npx prisma generate && tsc",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc && npx prisma generate",
     "start": "node dist/index.js",
