@@ -1,0 +1,33 @@
+{
+  "name": "campus-event-hub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-grade Campus Event Management Platform",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev:server": "npm --workspace=server run dev",
+    "dev:client": "npm --workspace=client run dev",
+    "dev": "npm run dev:server",
+    "build:server": "npm --workspace=server run build",
+    "build:client": "npm --workspace=client run build",
+    "build": "npm run build:server && npm run build:client",
+    "lint:server": "npm --workspace=server run lint",
+    "lint:client": "npm --workspace=client run lint",
+    "lint": "npm run lint:server && npm run lint:client",
+    "prisma:generate": "npm --workspace=server run prisma:generate",
+    "prisma:migrate": "npm --workspace=server run prisma:migrate"
+  },
+  "keywords": [
+    "campus-events",
+    "event-management",
+    "nextjs",
+    "express",
+    "prisma",
+    "postgresql"
+  ],
+  "author": "",
+  "license": "ISC"
+}

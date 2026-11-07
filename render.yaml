@@ -1,0 +1,51 @@
+# ==============================================================================
+# Render Blueprint (Infrastructure-as-Code) - Campus Event Hub
+# Automated production deployment specification for API and Web services
+# ==============================================================================
+services:
+  # ─── 1. Backend API Service ──────────────────────────────────────────────────
+  - type: web
+    name: campus-event-hub-api
+    runtime: node
+    region: oregon
+    plan: free
+    branch: main
+    rootDir: server
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/venues
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false # Bind Neon PostgreSQL connection string in Render Dashboard (zero leakage)
+      - key: JWT_SECRET
+        generateValue: true
+      - key: COOKIE_SECRET
+        generateValue: true
+      - key: CLIENT_URL
+        fromService:
+          type: web
+          name: campus-event-hub-web
+          property: host
+
+  # ─── 2. Frontend Next.js Client Service ─────────────────────────────────────
+  - type: web
+    name: campus-event-hub-web
+    runtime: node
+    region: oregon
+    plan: free
+    branch: main
+    rootDir: client
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: campus-event-hub-api
+          property: host

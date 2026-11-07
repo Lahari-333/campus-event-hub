@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Environment Variables & Secrets (Strictly Excluded)
+.env
+.env.*
+!.env.example
+
+# Build Output
+dist/
+build/
+*.tsbuildinfo
+
+# Logs & Debug
+logs/
+*.log
+npm-debug.log*
+
+# Prisma
+# Note: schema.prisma is tracked, but generated client in node_modules is ignored

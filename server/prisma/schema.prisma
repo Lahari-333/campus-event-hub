@@ -1,0 +1,202 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  STUDENT
+  ORGANIZER
+  ADMIN
+}
+
+enum EventStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+}
+
+enum RegistrationStatus {
+  CONFIRMED
+  WAITLISTED
+  CANCELLED
+  ATTENDED
+  CHECKED_IN
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(STUDENT)
+  department   String?
+  createdAt    DateTime @default(now())
+
+  // Relations
+  organizedEvents Event[]        @relation("OrganizerEvents")
+  registrations   Registration[]
+  auditLogs       AuditLog[]
+  ledTeams        Team[]         @relation("TeamLeader")
+  teamMemberships TeamMember[]
+  feedbacks       Feedback[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model Venue {
+  id          String  @id @default(cuid())
+  name        String
+  capacity    Int
+  location    String
+  isAvailable Boolean @default(true)
+
+  // Relations
+  events Event[]
+
+  @@index([isAvailable])
+  @@map("venues")
+}
+
+model Event {
+  id               String      @id @default(cuid())
+  title            String
+  description      String
+  category         String
+  venueId          String
+  startTime        DateTime
+  endTime          DateTime
+  capacity         Int
+  waitlistCapacity Int         @default(0)
+  status           EventStatus @default(DRAFT)
+  organizerId      String
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  // Relations
+  venue         Venue          @relation(fields: [venueId], references: [id])
+  organizer     User           @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  registrations Registration[]
+  teams         Team[]
+  announcements Announcement[]
+  feedbacks     Feedback[]
+
+  @@index([status])
+  @@index([category])
+  @@index([organizerId])
+  @@index([startTime])
+  @@map("events")
+}
+
+model Registration {
+  id               String             @id @default(cuid())
+  userId           String
+  eventId          String
+  qrToken          String?            @unique @default(cuid())
+  status           RegistrationStatus @default(CONFIRMED)
+  waitlistPosition Int?
+  seatNumber       String?
+  checkedInAt      DateTime?
+  registeredAt     DateTime           @default(now())
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  // DB-level uniqueness: one user, one registration per event
+  @@unique([userId, eventId])
+  @@index([status])
+  @@index([eventId])
+  @@map("registrations")
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  leaderId  String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  // Relations
+  leader  User         @relation("TeamLeader", fields: [leaderId], references: [id], onDelete: Cascade)
+  event   Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  members TeamMember[]
+
+  @@index([eventId])
+  @@map("teams")
+}
+
+model TeamMember {
+  id       String   @id @default(cuid())
+  teamId   String
+  userId   String
+  joinedAt DateTime @default(now())
+
+  // Relations
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([teamId])
+  @@map("team_members")
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  eventId   String
+  title     String
+  message   String
+  createdAt DateTime @default(now())
+
+  // Relations
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@map("announcements")
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@index([eventId])
+  @@map("feedbacks")
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  performedBy String
+  action      String
+  details     Json?
+  timestamp   DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [performedBy], references: [id], onDelete: Cascade)
+
+  @@index([performedBy])
+  @@index([timestamp])
+  @@map("audit_logs")
+}
