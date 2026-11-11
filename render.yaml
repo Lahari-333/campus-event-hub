@@ -13,7 +13,7 @@ services:
     rootDir: server
     buildCommand: npm ci && npm run build
     startCommand: npm run start
-    healthCheckPath: /api/venues
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
@@ -26,26 +26,4 @@ services:
       - key: COOKIE_SECRET
         generateValue: true
       - key: CLIENT_URL
-        fromService:
-          type: web
-          name: campus-event-hub-web
-          property: host
-
-  # ─── 2. Frontend Next.js Client Service ─────────────────────────────────────
-  - type: web
-    name: campus-event-hub-web
-    runtime: node
-    region: oregon
-    plan: free
-    branch: main
-    rootDir: client
-    buildCommand: npm ci && npm run build
-    startCommand: npm run start
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: NEXT_PUBLIC_API_URL
-        fromService:
-          type: web
-          name: campus-event-hub-api
-          property: host
+        value: https://campus-event-hub-web-single3.vercel.app

@@ -1,12 +1,18 @@
 const path = require('path');
 
+const isVercel = !!process.env.VERCEL;
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Enable strict mode for better React safety
   reactStrictMode: true,
-  // Standalone output for containerized deployments
-  output: 'standalone',
-  outputFileTracingRoot: path.join(__dirname, '../'),
+  // Standalone output for containerized deployments (disabled on Vercel to preserve native serverless routing)
+  ...(isVercel
+    ? {}
+    : {
+        output: 'standalone',
+        outputFileTracingRoot: path.join(__dirname, '../'),
+      }),
   // Ignore root ESLint lookup during production Next.js compilation
   eslint: {
     ignoreDuringBuilds: true,
