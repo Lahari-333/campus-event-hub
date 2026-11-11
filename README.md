@@ -230,7 +230,7 @@ Campus Event Hub is architected for decoupling:
 | Service | Target Platform | Live Production URL |
 | :--- | :--- | :--- |
 | **Frontend Web** | Vercel | [https://campus-event-hub-web-single3.vercel.app](https://campus-event-hub-web-single3.vercel.app) |
-| **Backend API** | Render | *(Configured during Phase 4 deployment)* |
+| **Backend API** | Render | [https://campus-event-hub-api-v8to.onrender.com](https://campus-event-hub-api-v8to.onrender.com) |
 | **Database** | Neon PostgreSQL | Cloud Managed Instance |
 
 ---
